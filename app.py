@@ -1,6 +1,7 @@
 import random
 import streamlit as st
 import pandas as pd
+
 # ======================
 # Các hàm xử lý
 # ======================
@@ -40,21 +41,24 @@ def tao_lang_gieng(lich, mon_hoc, phong_hoc, thoi_gian):
     new_lich[mh] = (random.choice(phong_hoc), random.choice(thoi_gian))
     return new_lich
 
-def hill_climbing(mon_hoc, giang_vien, lop_hoc, phong_hoc, thoi_gian, max_iter=1000):
+# Hill Climbing ngẫu nhiên
+def hill_climbing_random(mon_hoc, giang_vien, lop_hoc, phong_hoc, thoi_gian, max_iter=1000, p_accept=0.1):
     lich = tao_lich_ngau_nhien(mon_hoc, phong_hoc, thoi_gian)
     cost = tinh_xung_dot(lich, giang_vien, lop_hoc)
     for _ in range(max_iter):
         neighbor = tao_lang_gieng(lich, mon_hoc, phong_hoc, thoi_gian)
         new_cost = tinh_xung_dot(neighbor, giang_vien, lop_hoc)
-        if new_cost < cost:
+        # nhận nghiệm tốt hơn hoặc thỉnh thoảng nhận nghiệm xấu
+        if new_cost < cost or random.random() < p_accept:
             lich, cost = neighbor, new_cost
-        if cost == 0: 
+        if cost == 0:
             break
     return lich, cost
+
 # ======================
 # Streamlit UI
 # ======================
-st.title("📅 Lập lịch học bằng Hill Climbing")
+st.title("📅 Lập lịch học bằng Randomized Hill Climbing")
 
 # Khởi tạo session state
 if "ds_mon" not in st.session_state:
@@ -68,6 +72,7 @@ with st.form("them_mon", clear_on_submit=True):
     so_buoi = st.number_input("Số buổi", min_value=1, step=1, value=1)
     if st.form_submit_button("➕ Thêm môn") and mh and gv and lop:
         st.session_state.ds_mon.append((mh, gv, lop, so_buoi))
+
 # Hiển thị danh sách môn đã thêm
 if st.session_state.ds_mon:
     st.subheader("📘 Danh sách môn đã nhập")
@@ -75,6 +80,7 @@ if st.session_state.ds_mon:
     if st.button("🗑️ Xoá tất cả"):
         st.session_state.ds_mon = []
         st.rerun()
+
 # Chạy thuật toán
 if st.button("🚀 Chạy tối ưu lịch") and st.session_state.ds_mon:
     mon_hoc, giang_vien, lop_hoc = [], {}, {}
@@ -87,7 +93,7 @@ if st.button("🚀 Chạy tối ưu lịch") and st.session_state.ds_mon:
 
     phong_hoc = [f"P{i:03}" for i in range(1, 31)]
     thoi_gian = tao_thoi_gian()
-    best_schedule, best_cost = hill_climbing(mon_hoc, giang_vien, lop_hoc, phong_hoc, thoi_gian, max_iter=2000)
+    best_schedule, best_cost = hill_climbing_random(mon_hoc, giang_vien, lop_hoc, phong_hoc, thoi_gian, max_iter=2000, p_accept=0.05)
 
     st.subheader("📌 Kết quả")
     st.write(f"🔍 Số xung đột: {best_cost}")
@@ -96,8 +102,8 @@ if st.button("🚀 Chạy tối ưu lịch") and st.session_state.ds_mon:
     else:
         st.warning("⚠️ Còn xung đột, hãy thử chạy lại.")
     df = pd.DataFrame([
-    {"Thời gian": tg, "Phòng": phong, "Môn": mh, "GV": giang_vien[mh], "Lớp": lop_hoc[mh]}
-    for mh, (phong, tg) in best_schedule.items()
-])
+        {"Thời gian": tg, "Phòng": phong, "Môn": mh, "GV": giang_vien[mh], "Lớp": lop_hoc[mh]}
+        for mh, (phong, tg) in best_schedule.items()
+    ])
     st.subheader("📌 Lịch chi tiết")
     st.dataframe(df.sort_values(by="Thời gian"), use_container_width=True)
