@@ -1,34 +1,38 @@
-# 📅 Ứng dụng Xếp Lịch Học - Khoa CNTT (Hill Climbing)
+# 📅 Ứng dụng thuật toán Hill Climbing cho bài toán xếp thời khóa biểu
 
-Ứng dụng này được xây dựng bằng **Python** và **Streamlit** để mô phỏng bài toán **xếp lịch học** cho khoa CNTT, sử dụng **thuật toán leo đồi ngẫu nhiên (Random Hill Climbing)**.  
-Ứng dụng sẽ tự động phân bổ **môn học - giảng viên - lớp - phòng học - thời gian** sao cho hạn chế tối đa **xung đột** (giảng viên/lớp/phòng bị trùng giờ).
+## 🚀 Giới thiệu
+Đây là một ứng dụng minh họa cách sử dụng **thuật toán Hill Climbing** để giải bài toán **xếp thời khóa biểu**.  
+Ứng dụng được xây dựng bằng **Python** và **Streamlit**, cho phép người dùng nhập danh sách môn học, giảng viên, lớp học và số buổi học, sau đó tự động tối ưu để tạo ra một lịch học với số xung đột thấp nhất.
 
 ---
 
-## 🚀 Tính năng
-- Sinh ngẫu nhiên thời khóa biểu cho các môn học.
-- Đánh giá số lượng xung đột trong lịch.
-- Sử dụng **Hill Climbing** để cải thiện và tối ưu lịch.
-- Giao diện trực quan với **Streamlit**:
-  - Cho phép chỉnh số lần lặp (`iterations`) của thuật toán.
-  - Hiển thị bảng lịch học kết quả.
-  - Thông báo khi tìm được lịch không còn xung đột.
+## ⚙️ Cách hoạt động
+- Người dùng nhập:
+  - Tên môn học
+  - Giảng viên phụ trách
+  - Lớp học
+  - Số buổi (một môn có thể chiếm nhiều buổi khác nhau)
+- Hệ thống sinh ngẫu nhiên lịch ban đầu.
+- Thuật toán **Hill Climbing** sẽ tìm kiếm lịch tốt hơn bằng cách thay đổi dần (neighbor search) để **giảm số xung đột**:
+  - Xung đột phòng (2 môn học cùng phòng cùng thời gian).
+  - Xung đột giảng viên (GV bị trùng giờ).
+  - Xung đột lớp học (lớp bị học 2 môn cùng giờ).
+- Kết quả được hiển thị trực quan bằng bảng lịch.
 
 ---
 
 ## 🛠️ Cài đặt
-
-### 1. Clone dự án
+### 1. Clone project
 ```bash
-git clone https://github.com/ten-ban/repo-xep-lich.git
-cd repo-xep-lich
+git clone https://github.com/your-repo/timetable-hillclimbing.git
+cd timetable-hillclimbing
 ```
 
-### 2. Tạo môi trường ảo (khuyến nghị)
+### 2. Tạo môi trường ảo (khuyến khích)
 ```bash
 python -m venv venv
-source venv/bin/activate    # Linux/Mac
-venv\Scripts\activate       # Windows
+source venv/bin/activate   # Linux/Mac
+venv\Scripts\activate      # Windows
 ```
 
 ### 3. Cài đặt thư viện
@@ -36,9 +40,10 @@ venv\Scripts\activate       # Windows
 pip install -r requirements.txt
 ```
 
-File `requirements.txt` gồm:
+File `requirements.txt`:
 ```
 streamlit
+pandas
 ```
 
 ---
@@ -48,39 +53,33 @@ streamlit
 streamlit run app.py
 ```
 
-Sau đó mở trình duyệt tại [http://localhost:8501](http://localhost:8501).
-
----
-
-## 📂 Cấu trúc dự án
+Ứng dụng sẽ mở trên trình duyệt mặc định tại địa chỉ:
 ```
-.
-├── app.py          # File chính chứa thuật toán + UI
-├── README.md       # Tài liệu mô tả dự án
-└── requirements.txt
+http://localhost:8501
 ```
 
 ---
 
-## 📖 Thuật toán sử dụng
-- **Random Hill Climbing**:
-  - Bắt đầu với một lịch ngẫu nhiên.
-  - Lặp lại nhiều lần:
-    - Sinh một "láng giềng" (neighbor) bằng cách đổi ngẫu nhiên phòng/thời gian cho một môn.
-    - Nếu lịch mới tốt hơn (ít xung đột hơn), chấp nhận thay thế.
-  - Dừng khi tìm được lịch **không xung đột** hoặc đạt số vòng lặp tối đa.
+## 📊 Minh họa giao diện
+- Nhập danh sách môn học, giảng viên, lớp học, số buổi.
+- Nhấn **🚀 Chạy tối ưu lịch** để hệ thống sinh ra lịch học.
+- Bảng kết quả sẽ hiển thị:
+  - Số lượng xung đột
+  - Lịch học chi tiết được sắp xếp theo thời gian
 
 ---
 
-
-
-Ứng dụng sẽ hiển thị bảng lịch học tối ưu và số xung đột:
-
-| Môn học       | Giảng viên | Lớp   | Phòng | Thời gian |
-|---------------|------------|-------|-------|-----------|
-| AI            | Thầy A     | CNTT1 | P101  | T2-Sáng   |
-| DL            | Thầy B     | CNTT1 | P103  | T3-Chiều  |
-| ...           | ...        | ...   | ...   | ...       |
+## 🧮 Thuật toán Hill Climbing
+- **Khởi tạo:** sinh ngẫu nhiên một lịch học.
+- **Đánh giá:** tính số xung đột.
+- **Tìm kiếm láng giềng:** thay đổi ngẫu nhiên lịch của một môn học.
+- **Chấp nhận:** nếu lịch mới có ít xung đột hơn thì cập nhật.
+- **Dừng:** khi đạt lịch không có xung đột hoặc hết số vòng lặp cho phép.
 
 ---
 
+## 📌 Ghi chú
+- Do Hill Climbing có thể rơi vào **cực trị địa phương**, kết quả đôi khi vẫn còn xung đột. Có thể chạy lại nhiều lần để tìm lịch tốt hơn.
+- Có thể mở rộng thêm các thuật toán khác như: **Simulated Annealing**, **Genetic Algorithm** để cải thiện chất lượng kết quả.
+
+---
