@@ -72,7 +72,7 @@ def hill_climbing_stochastic(mon_hoc, giang_vien, lop_hoc, mon_phong, phong_hoc,
             break
     return lich, cost
 
-st.title("📅 Lập lịch học bằng Stochastic Hill Climbing")
+st.title("📅 Lập thời khoá biểu bằng Stochastic Hill Climbing")
 
 if "ds_mon" not in st.session_state:
     st.session_state.ds_mon = []
